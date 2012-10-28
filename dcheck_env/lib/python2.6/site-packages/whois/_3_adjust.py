@@ -1,0 +1,82 @@
+import sys
+import datetime
+
+PYTHON_VERSION = sys.version_info[0]
+
+
+
+class Domain:
+
+	def __init__(self, data):
+		self.name				= data['domain_name'][0].strip().lower()
+		self.registrar			= data['registrar'][0].strip()
+		self.creation_date		= str_to_date(data['creation_date'][0])
+		self.expiration_date	= str_to_date(data['expiration_date'][0])
+		self.last_updated		= str_to_date(data['updated_date'][0])
+		#self.name_servers		= data['name_servers']
+
+
+
+
+
+
+
+
+
+
+
+# http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+DATE_FORMATS = [
+	'%d-%b-%Y',						# 02-jan-2000
+	'%d.%m.%Y',						# 02.02.2000
+	'%Y-%m-%d',						# 2000-01-02
+	'%Y.%m.%d',						# 2000.01.02
+	'%Y/%m/%d',						# 2005/05/30
+
+	'%Y.%m.%d %H:%M:%S',			# 2002.09.19 13:00:00
+	'%d-%b-%Y %H:%M:%S %Z',			# 24-Jul-2009 13:20:03 UTC
+	'%Y/%m/%d %H:%M:%S (%z)',		# 2011/06/01 01:05:01 (JST)
+	'%a %b %d %H:%M:%S %Z %Y',		# Tue Jun 21 23:59:59 GMT 2011
+	'%a %b %d %Y',					# Tue Dec 12 2000
+	'%Y-%m-%dT%H:%M:%S',			# 2007-01-26T19:10:31
+	'%Y-%m-%dT%H:%M:%SZ',			# 2007-01-26T19:10:31Z
+	'%Y-%m-%dT%H:%M:%S%z',			# 2011-03-30T19:36:27+0200
+	'%Y-%m-%dT%H:%M:%S.%f%z',		# 2011-09-08T14:44:51.622265+03:00
+]
+
+
+def str_to_date(s):
+	s = s.strip().lower()
+	if not s or s == 'not defined': return
+
+	if PYTHON_VERSION < 3: return str_to_date_py2(s)
+
+	# TODO: beznadziejne wyjatki !
+	if s.endswith('+02:00'): s = s.replace('+02:00', '+0200')
+	elif s.endswith('+03:00'): s = s.replace('+03:00', '+0300')
+	elif s.endswith('+12:00'): s = s.replace('+12:00', '+1200')
+	elif s.endswith('+13:00'): s = s.replace('+13:00', '+1300')
+	s = s.replace('(jst)', '(+0900)')
+
+	for format in DATE_FORMATS:
+		try: return datetime.datetime.strptime(s, format)
+		except ValueError as e: pass
+
+	raise ValueError("Unknown date format: '%s'" % s)
+
+
+def str_to_date_py2(s):
+
+	# TODO: beznadziejne wyjatki !
+	tz = 0
+	if s.endswith('+02:00'): s = s.replace('+02:00', ''); tz = 2
+	elif s.endswith('+03:00'): s = s.replace('+03:00', ''); tz = 3
+	elif s.endswith('+12:00'): s = s.replace('+12:00', ''); tz = 12
+	elif s.endswith('+13:00'): s = s.replace('+13:00', ''); tz = 13
+
+	for format in DATE_FORMATS:
+		try: return datetime.datetime.strptime(s, format) + datetime.timedelta(hours=tz)
+		except ValueError as e: pass
+
+	raise ValueError("Unknown date format: '%s'" % s)
+
