@@ -1,5 +1,26 @@
 from dns import resolver, reversename
+import socket
 
+WHOIS_SERVER = 'whois.ripe.net'
+
+def whois(domain_name):
+    """Run a quick whois for a domain name
+
+    """
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soc.connect((domain_name.split('.')[-1]+'.whois-servers.net', 43))
+    soc.send(domain_name+'\r\n')
+
+    response = ''
+    while True:
+        res_chunk = soc.recv(4096)
+        response += res_chunk
+        if not res_chunk:
+            break
+
+    soc.close()
+
+    return response
 
 def get_a(domain_name):
     try: 
@@ -42,6 +63,9 @@ def full_search(domain_name):
         if res:
             a_records.append( (prefix, res,) )
 
+    whois_results = whois(domain_name)
+
     return {"nameservers": nameservers,
             "mx": mx,
-            "a": a_records}
+            "a": a_records,
+            "whois": whois_results}

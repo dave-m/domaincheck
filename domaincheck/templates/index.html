@@ -6,42 +6,54 @@
 </head>
 <body>
     <div class="container">
-        <div class="row" id="title-bar">
+        <div class="row-fluid" id="title-bar">
             <div class="span4 offset4">
                 <h1>Domain checker</h1>
             </div>
         </div>
 
-        <div id="search">
+        <div id="search" class="row-fluid">
             <h2>Search for a domain<h2>
             <form data-bind="submit: checkDomain">
                 <label for="domain" >Domain:</label><input data-bind="value: domain" type="search" name="domain"/>
                 <input type="submit" value="Search"/>
             </form>
         </div>
-        <div data-bind="visible: nameservers().length > 0">
-            <h2>Results</h2>
-            <div>
-                <p>Nameservers:</p>
-                <ul data-bind="foreach: nameservers">
-                    <li data-bind="text: $data"></li>
-                </ul>
-            </div>
-            <div data-bind="visible: a().length > 0">
-                <p>A records:</p>
-                <ul data-bind="foreach: a">
-                    <li data-bind="text: $data"></li>
-                </ul>
-            </div>
-            <div data-bind="visible: mx().length > 0">
-                <p>MX records:</p>
-                <ul data-bind="foreach: mx">
-                    <li data-bind="text: $data"></li>
-                </ul>
-            </div>
-        </div>
-        <div data-bind="visible: loading"
+        <div data-bind="visible: loading" id="loading">
             <h2>Loading...</h2>
+        </div>
+        <div class="row-fluid" data-bind="visible: nameservers().length > 0" id="results">
+
+            <div class="span4" style="padding: 0.5em">
+                 <h2>Results</h2>
+                <div>
+                    <p>Nameservers:</p>
+                    <ul data-bind="foreach: nameservers">
+                        <li data-bind="text: $data"></li>
+                    </ul>
+                </div>
+                <div data-bind="visible: a().length > 0">
+                    <p>A records:</p>
+                    <ul data-bind="foreach: a">
+                        <li>
+                            <span style="font-weight: bold;" data-bind="text: subdomain"></span>: <ul data-bind="foreach: records"><li data-bind="text: $data"></li></ul>
+                        </li>
+                    </ul>
+                </div>
+                <div data-bind="visible: mx().length > 0">
+                    <p>MX records:</p>
+                    <ul data-bind="foreach: mx">
+                        <li>
+                            <span style="font-weight: bold;" data-bind="text: subdomain"></span> Priority: <span data-bind="text: records"></span>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="span8">
+                <h3>Whois results</h3>
+                <pre data-bind="text: whois"></pre>
+            </div>
         </div>
     </div>
 
@@ -55,6 +67,7 @@
             self.a = ko.observableArray([]);
             self.mx = ko.observableArray([]);
             self.nameservers = ko.observableArray([]);
+            self.whois = ko.observable();
 
             // Status
             self.loading = ko.observable(false);
@@ -66,15 +79,17 @@
                         type: 'POST',
                         success: function(result){
                             self.loading(false);
-                            self.a(result.a);
-                            self.mx(result.mx);
+                            self.a($.map(result.a, function(item){ return {subdomain: item[0], records:item[1]}}));
+                            self.mx($.map(result.mx, function(item){ return {subdomain: item[0], records:item[1]}}));
                             self.nameservers(result.nameservers);
+                            self.whois(result.whois);
                         },
                         error: function(){
                             self.loading(false);
                             self.a([]);
                             self.mx([]);
                             self.nameservers([]);
+                            self.whois('');
                         },
                 });
             }
