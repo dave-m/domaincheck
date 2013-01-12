@@ -2,6 +2,7 @@
 Domain checker
 Shows a website that allows you to check the status of a domain
 """
+import os
 from flask import Flask, render_template, request, jsonify
 from werkzeug.exceptions import NotFound, BadRequest
 from check import full_search
@@ -36,4 +37,5 @@ def check_domain():
     return jsonify(res)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
