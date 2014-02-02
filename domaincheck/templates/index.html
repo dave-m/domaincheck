@@ -22,6 +22,8 @@
         <div data-bind="visible: loading" id="loading">
             <h2>Loading...</h2>
         </div>
+
+        <!-- Results -->
         <div class="row-fluid" data-bind="visible: nameservers().length > 0" id="results">
 
             <div class="span4" style="padding: 0.5em">
@@ -52,7 +54,7 @@
             </div>
             <div class="span8">
                 <h3>Whois results</h3>
-                <pre data-bind="text: whois"></pre>
+                <pre style="height:30em; overflow-y: scroll" data-bind="text: whois"></pre>
             </div>
         </div>
     </div>

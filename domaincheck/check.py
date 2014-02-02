@@ -23,20 +23,31 @@ def whois(domain_name):
     return response
 
 def get_a(domain_name):
-    try: 
+    """Get the A records, return list of addresses
+    
+    """
+    try:
         answer = resolver.query(domain_name, 'A')
         return [a.address for a in answer]
     except (resolver.NoAnswer, resolver.NXDOMAIN):
         return []
 
 def get_mx(domain_name):
+    """Get MX records, return list of tuples of (record, preference)
+
+    """
     try:
         answer = resolver.query(domain_name, 'MX')
     except (resolver.NoAnswer, resolver.NXDOMAIN):
         return []
-    return sorted(((str(a.exchange), a.preference) for a in answer), key=lambda x: x[1])
+    return sorted(
+            ((str(a.exchange), a.preference) for a in answer),
+            key=lambda x: x[1])
 
 def get_ns(domain_name):
+    """Get the NS (nameserver) records, return list of IP addresses
+
+    """
     try:
         answer = resolver.query(domain_name, 'NS')
         return [str(a.target) for a in answer]
@@ -44,19 +55,28 @@ def get_ns(domain_name):
         return []
 
 def get_host(domain_name):
-    # get IP
-    a = get_a(domain_name)
-    hosts = []
-    for ip in a:
-        reverse = str(reversename.from_address(str(ip)))
-        name = resolver.query(reverse, 'PTR')
-        hosts.append(name)
+    """Get a list of the hostnames (PTR) associated
+    with the supplied domain name.
+
+    Do this by querying every A record associated
+
+    """
+    return [
+        resolver.query(
+            str(reversename.from_address(str(ip)))
+        , 'PTR')
+        for ip in get_a(domain_name)
+    ]
 
 def full_search(domain_name):
+    """Get the A, MX, Nameservers and whois records
+    for the supplied domain name
+    
+    Check ``www``, ``ftp``, ``mail``, and naked domain A records
+
+    """
 
     nameservers = get_ns(domain_name)
-    mx = get_mx(domain_name)
-
     a_records = []
     for prefix in ['', 'www.', 'ftp.', 'mail.']:
         res = get_a(prefix+domain_name)
@@ -66,6 +86,6 @@ def full_search(domain_name):
     whois_results = whois(domain_name)
 
     return {"nameservers": nameservers,
-            "mx": mx,
+            "mx": get_mx(domain_name) ,
             "a": a_records,
             "whois": whois_results}
