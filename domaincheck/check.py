@@ -8,8 +8,11 @@ def whois(domain_name):
 
     """
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.connect((domain_name.split('.')[-1]+'.whois-servers.net', 43))
-    soc.send(domain_name+'\r\n')
+    try:
+        soc.connect((domain_name.split('.')[-1]+'.whois-servers.net', 43))
+        soc.send(domain_name+'\r\n')
+    except:
+        return ''
 
     response = ''
     while True:
@@ -24,7 +27,7 @@ def whois(domain_name):
 
 def get_a(domain_name):
     """Get the A records, return list of addresses
-    
+
     """
     try:
         answer = resolver.query(domain_name, 'A')
@@ -40,6 +43,7 @@ def get_mx(domain_name):
         answer = resolver.query(domain_name, 'MX')
     except (resolver.NoAnswer, resolver.NXDOMAIN):
         return []
+
     return sorted(
             ((str(a.exchange), a.preference) for a in answer),
             key=lambda x: x[1])
@@ -54,24 +58,10 @@ def get_ns(domain_name):
     except (resolver.NoAnswer, resolver.NXDOMAIN):
         return []
 
-def get_host(domain_name):
-    """Get a list of the hostnames (PTR) associated
-    with the supplied domain name.
-
-    Do this by querying every A record associated
-
-    """
-    return [
-        resolver.query(
-            str(reversename.from_address(str(ip)))
-        , 'PTR')
-        for ip in get_a(domain_name)
-    ]
-
 def full_search(domain_name):
     """Get the A, MX, Nameservers and whois records
     for the supplied domain name
-    
+
     Check ``www``, ``ftp``, ``mail``, and naked domain A records
 
     """
@@ -89,3 +79,4 @@ def full_search(domain_name):
             "mx": get_mx(domain_name) ,
             "a": a_records,
             "whois": whois_results}
+
