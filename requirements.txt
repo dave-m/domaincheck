@@ -8,3 +8,4 @@ wsgiref
 nose
 pulsar
 coverage
+unittest2
