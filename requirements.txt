@@ -6,3 +6,4 @@ distribute
 dnspython
 wsgiref
 nose
+pulsar
