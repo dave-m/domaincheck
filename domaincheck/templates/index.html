@@ -4,9 +4,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-
-    <link href="/static/css/index.css" rel="stylesheet">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
@@ -83,27 +80,23 @@
             // Status
             self.loading = ko.observable(false);
 
-            self.checkDomain = function(){
+            self.checkDomain = function() {
                 self.loading(true);
-                $.ajax({url: '/check',
-                        data: {"domain": self.domain},
-                        type: 'POST',
-                        success: function(result){
-                            self.loading(false);
-                            self.a($.map(result.a, function(item){ return {subdomain: item[0], records:item[1]}}));
-                            self.mx($.map(result.mx, function(item){ return {subdomain: item[0], records:item[1]}}));
-                            self.nameservers(result.nameservers);
-                            self.whois(result.whois);
-                        },
-                        error: function(){
-                            self.loading(false);
-                            self.a([]);
-                            self.mx([]);
-                            self.nameservers([]);
-                            self.whois('');
-                        },
+                $.get('/check/'+self.domain()
+                ).done(function(result) {
+                    self.loading(false);
+                    self.a($.map(result.a, function(item){ return {subdomain: item[0], records:item[1]}}));
+                    self.mx($.map(result.mx, function(item){ return {subdomain: item[0], records:item[1]}}));
+                    self.nameservers(result.nameservers);
+                    self.whois(result.whois);
+                }).fail(function() {
+                    self.loading(false);
+                    self.a([]);
+                    self.mx([]);
+                    self.nameservers([]);
+                    self.whois('');
                 });
-            }
+            } 
         }
         $(document).ready(function(){
             ko.applyBindings(new domainResultModel());

@@ -17,23 +17,21 @@ def main():
     """
     return render_template('index.html')
 
-@app.route('/check', methods=['POST'])
-def check_domain():
+@app.route('/check/<domain_name>', methods=['GET'])
+def check_domain(domain_name):
     """Accept POST, check domain details for supplied
     domain
 
     """
-    domain = request.form.get('domain')
-    if not domain:
-        print "form: ", request.form
+    if not domain_name:
         return BadRequest('No supplied domain!')
 
-    res = full_search(domain)
+    res = full_search(domain_name)
 
     if not res['a'] and not res['mx'] and not res['nameservers']:
-        return NotFound('No data for domain: %s' % domain)
+        return NotFound('No data for domain: {0}'.format(domain_name))
 
-    res['a'] = [(a[0]+domain, a[1]) for a in res['a']]
+    res['a'] = [(a[0]+domain_name, a[1]) for a in res['a']]
 
     return jsonify(res)
 
