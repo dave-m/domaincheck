@@ -32,11 +32,12 @@
                     <h2>Loading...</h2>
                 </div>
 
-                    <!-- Results -->
+                <!-- Results -->
                 <div class="row" data-bind="visible: nameservers().length > 0" id="results">
                     <div class="row">
                         <div class="col-md-4 col-md-offset-2">
-                            <h2 class="text-center">Results</h2>
+                            <h2 class="text-center">Results for <span
+                                    data-bind="text: domain"></span></h2>
                         </div>
                     </div>
                     <div class="row">
