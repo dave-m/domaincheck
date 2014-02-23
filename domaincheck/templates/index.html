@@ -14,54 +14,64 @@
             </div>
         </div>
     </div>
-<div class="container" style="padding-top: 60px">
 
-        <form class="form-inline" role="form" data-bind="submit: checkDomain">
-            <div class="form-group">
-                <input placeholder="Search for Domain" data-bind="value: domain" type="search" class="form-control"/>
-            </div>
+    <div class="container-fluid" style="padding-top: 60px">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-2">
 
-            <div class="form-group">
-                <input class="btn btn-default" type="submit" value="Search"/>
-            </div>
-        </form>
-
-        <div data-bind="visible: loading" id="loading">
-            <h2>Loading...</h2>
-        </div>
-
-        <!-- Results -->
-        <div class="row-fluid" data-bind="visible: nameservers().length > 0" id="results">
-
-            <div class="span4">
-                 <h2>Results</h2>
-                <div>
-                    <p>Nameservers:</p>
-                    <ul data-bind="foreach: nameservers">
-                        <li data-bind="text: $data"></li>
-                    </ul>
+                <div class="row">
+                    <form class="form-inline" role="form" data-bind="submit: checkDomain">
+                        <div class="form-group">
+                            <input placeholder="Search for Domain" data-bind="value: domain" type="search" class="form-control">
+                        </div>
+                        <input class="btn btn-default" type="submit" value="Search">
+                    </form>
                 </div>
-                <div data-bind="visible: a().length > 0">
-                    <p>A records:</p>
-                    <ul data-bind="foreach: a">
-                        <li>
-                            <span style="font-weight: bold;" data-bind="text: subdomain"></span>: <ul data-bind="foreach: records"><li data-bind="text: $data"></li></ul>
-                        </li>
-                    </ul>
-                </div>
-                <div data-bind="visible: mx().length > 0">
-                    <p>MX records:</p>
-                    <ul data-bind="foreach: mx">
-                        <li>
-                            <span style="font-weight: bold;" data-bind="text: subdomain"></span> Priority: <span data-bind="text: records"></span>
-                        </li>
 
-                    </ul>
+                <div class="row" data-bind="visible: loading" id="loading">
+                    <h2>Loading...</h2>
                 </div>
-            </div>
-            <div class="span6">
-                <h3>Whois results</h3>
-                <pre style="height:30em; overflow-y: scroll" data-bind="text: whois"></pre>
+
+                    <!-- Results -->
+                <div class="row" data-bind="visible: nameservers().length > 0" id="results">
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-2">
+                            <h2 class="text-center">Results</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h4>Nameservers:</h4>
+                            <ul data-bind="foreach: nameservers">
+                                <li data-bind="text: $data"></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3" data-bind="visible: a().length > 0">
+                            <h4>A records:</h4>
+                            <ul data-bind="foreach: a">
+                                <li>
+                                    <col-md- style="font-weight: bold;" data-bind="text: subdomain"></col-md->: <ul data-bind="foreach: records"><li data-bind="text: $data"></li></ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6" data-bind="visible: mx().length > 0">
+                            <!-- MX records tend to be a bit longer -->
+                            <h4>MX records:</h4>
+                            <ul data-bind="foreach: mx">
+                                <li>
+                                    <col-md- style="font-weight: bold;" data-bind="text: subdomain"></col-md-> Priority: <col-md- data-bind="text: records"></col-md->
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>Whois results</h3>
+                            <pre style="height:30em; overflow-y: scroll" data-bind="text: whois"></pre>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
