@@ -31,6 +31,9 @@
                 <div class="row" data-bind="visible: loading" id="loading">
                     <h2>Loading...</h2>
                 </div>
+                <div class="row" data-bind="visible: noResults">
+                    <h2>No results found</h2>
+                </div>
 
                 <!-- Results -->
                 <div class="row" data-bind="visible: nameservers().length > 0" id="results">
@@ -90,6 +93,10 @@
 
             // Status
             self.loading = ko.observable(false);
+            self.noResults = ko.computed(function () {
+                return self.nameservers().length === 0 && self.domain() &&
+                !self.loading();
+            });
 
             self.checkDomain = function() {
                 self.loading(true);
